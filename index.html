@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+
+    <title>reveal.js – The HTML Presentation Framework</title>
+
+    <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+    <meta name="author" content="Hakim El Hattab">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="dist/reset.css">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/black.css" id="theme">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+  </head>
+
+  <body>
+
+    <div class="reveal">
+
+      <!-- Any section element inside this container is displayed as a slide -->
+      <div class="slides">
+        <section>
+          <h3>React Dependency Arrays</h3>
+          <p>
+            <small>...and why <code>useEffect(..., [])</code> is very bad</small>
+          </p>
+        </section>
+
+        <section>
+          <h2>Very quick context</h2>
+          <ul>
+            <li>Dependency arrays are a common pattern used by <strong>React Hooks</strong></li>
+            <li><strong>React Hooks</strong> are used by functional React components to allow them to recreate functionality that was previously reserved for class component lifecycle methods</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>The most important point</h2>
+          <p class="fragment"><strong>React Hooks</strong> <u>do not</u> represent a new API for the <u>same</u> component lifecycle model.</p>
+          <p class="fragment">They represent a <u>mostly backwards-compatible change of that model</u>.</p>
+          <p class="fragment">Pretty much <u>no hook does exactly</u> what the old model did, as they represent a new and improved model.</p>
+          <div class="fragment">
+            <hr>
+            <p>To write good, maintainable React code we should embrace the new and improved model.</p>
+            <p>This new and improved model better matches up with the reactive and declarative paradigms.</p>
+          </div>
+        </section>
+
+        <section>
+          <h3>The second most important point</h3>
+          <p class="fragment">Do not make any assumptions about React Hooks based on class components.</p>
+          <p class="fragment">Check any assumptions that you've made up to this point.</p>
+        </section>
+
+        <section>
+          <h2 style="text-transform: none">Dependency Arrays and useEffect</h2>
+          <p>Dependency arrays and useEffect are the changes to the model that best represent the new way of thinking that is expected of React devs.</p>
+          <p>Example...</p>
+        </section>
+
+        <section>
+          <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers="|7,12">
+            import React, { useState, useEffect } from 'react';
+
+            export const Example = () => {
+              const [count, setCount] = useState(0);
+              const [shouldHighlight, setShouldHighlight] = useState(false);
+
+              useEffect(() => {
+                setShouldHighlight(true);
+                setTimeout(() => {
+                  setShouldHighlight(false);
+                }, 100);
+              }, [count]);
+
+              return (
+                &lt;div style={{ padding: 16, fontSize: 24, maxWidth: 80, textAlign: 'center' }}>
+                  &lt;div style={{
+                    background: shouldHighlight ? "#0f0" : "transparent",
+                    transition: shouldHighlight ? "none" : ".1s background ease-in",
+                  }}>
+                    {count}
+                  &lt;/div>
+                  &lt;br />
+                  &lt;button onClick={() => setCount(count + 1)}>+1&lt;/button>
+                &lt;/div>
+              );
+            }
+          </code></pre>
+        </section>
+
+        <section>
+          <h3>Result:</h3>
+          <div>
+            <iframe src="/embeds/a/" style="background:#fff;"></iframe>
+          </div>
+        </section>
+
+        <section>
+          <h2>Kahoot</h2>
+        </section>
+
+        <section>
+          <h2>Interactive version of the quiz question</h2>
+          <div>
+            <iframe src="/embeds/b/" style="background:#fff;"></iframe>
+          </div>
+        </section>
+
+        <section>
+          <h3>These dependency arrays and Object.is() comparisons are common across hooks</h3>
+          <p>useMemo and useCallback use the same hooks</p>
+          <p>useState and dependency arrays detect changes in the same way</p>
+          <p>as custom hooks are built atop the built-in hooks, other libraries generally follow these rules too</p>
+        </section>
+
+        <section>
+          <h3>What's the process for getting these arrays right?</h3>
+          <ol style="font-size: .7em">
+            <li>If the eslint rule is enabled, start with an empty array, and whenever it says something's missing, add it!</li>
+            <p><small><code>useEffect has a missing dependency: 'xyz'. Either include it or remove the dependency array. react-hooks/exhaustive-deps</code></small></p>
+            <li>If something is triggering the useEffect more than you'd like, it normally indicates an unhandled edge case. Handle them!</li>
+            <li>If it works without the dependency array there at all then you've defined the change well!*</li>
+          </ol>
+          <p><small>*defining the change well isn't the only objective, it can sometimes add excessive complexity</small></p>
+        </section>
+
+        <section>
+          <h3><em>In general...</em></h3>
+          <p>you should be defining <strong>what</strong> the change is, rather than <strong>how</strong> it should happen</p>
+          <p>if something goes wrong, ask yourself "is there a better way I can describe this change"</p>
+          <p>if you need multiple useEffects for the same "effect", you're using it wrong</p>
+        </section>
+
+        <section>
+          <h1>Useful guide</h1>
+          <p>
+            <a href="https://overreacted.io/a-complete-guide-to-useeffect/">https://overreacted.io/a-complete-guide-to-useeffect/</a> 49 min read! (w/ 3 min TLDR)
+          </p>
+          <hr>
+          End of presentation.
+        </section>
+      </div>
+    </div>
+
+    <script src="dist/reveal.js"></script>
+    <script src="plugin/zoom/zoom.js"></script>
+    <script src="plugin/notes/notes.js"></script>
+    <script src="plugin/search/search.js"></script>
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script>
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        center: true,
+        hash: true,
+        plugins: [ RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight ]
+      });
+    </script>
+  </body>
+</html>
